@@ -1,0 +1,1 @@
+Small app to let you find your seed using grandmas without having to export your save for whatever reason. 
