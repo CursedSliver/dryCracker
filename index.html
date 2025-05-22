@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Input Boxes</title>
+    <style>
+        .input-container {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+        button {
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Dry Cracker</h1>
+    Note: You do not need to input all grandma names; on average, 5 names are sufficient to guarantee exactly one valid seed; you will receive all possible seeds if your combination matches multiple. 
+    <br>Start from the left to the right and do not jump inputs. 
+    <h3>You must have Patreon grandma names <span>OFF</span>.</h3>
+    <div class="input-container" id="inputContainer" style="justify-content: center;"></div>
+        
+    </div>
+    <button style="font-size: 20px; padding: 10px 20px;" onclick="crackSeedAndOutput();">Submit</button>
+    <br>
+    <textarea id="outputBox" style="width: 300px; height: 100px; margin: auto; display: block; text-align: center; " placeholder="Seeds will appear here..."></textarea>
+
+    <script src="./main.js"></script>
+</body>
+</html>
