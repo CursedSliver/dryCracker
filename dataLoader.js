@@ -1,5 +1,4 @@
 let namesDataLoaded = false;
-const placeholder = new Symbol('placeholder');
 function loadData() {
     if (namesDataLoaded) { return; }
     for (let i of 'abcdefghijklmnopqrstuvwxyz') {
