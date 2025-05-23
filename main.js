@@ -235,27 +235,28 @@ function getSeedFromGrandmaTypes(orderArr, present) {
     if (amount === 19) {
         if (loadStatuses['normal'] >= 1 && loadStatuses['normal'] < 27) { return; }
         loadTData('dataFilesTypeNormal', 'normal');
-        awaitData(tData.normal, getSeedFromAllNormals, orderArr, amount);
+        awaitData('normal', getSeedFromAllNormals, orderArr, amount);
     } else if (amount === 20) { 
         if (loadStatuses['complete'] >= 1 && loadStatuses['complete'] < 27) { return; }
         loadTData('dataFilesTypeComplete', 'complete');
-        awaitData(tData.complete, getSeedFromComplete, orderArr, amount);
+        awaitData('complete', getSeedFromComplete, orderArr, amount);
     } else if (amount >= 21) {
         throw new Error('Invalid amount of grandma types present');
     } else if (amount >= 4) {
         if (loadStatuses['simplified'] >= 1 && loadStatuses['simplified'] < 27) { return; }
         loadTData('dataFilesTypeSimplified', 'simplified');
-        awaitData(tData.simplified, getSeedFromSimplified, orderArr, amount);
+        awaitData('simplified', getSeedFromSimplified, orderArr, amount);
     } else {
         throw new Error('Not enough grandma types present');
     }
 }
-function awaitData(containerToAwait, func, arg1, arg2) {
-    if (loadStatuses[containerToAwait] >= 27) {
+function awaitData(key, func, arg1, arg2) {
+    if (loadStatuses[key] >= 27) {
+        console.log('debuf2');
         return displaySeeds(func(arg1, arg2));
     }
     const interval = setInterval(() => {
-        if (loadStatuses[containerToAwait] >= 27) {
+        if (loadStatuses[key] >= 27) {
             clearInterval(interval);
             console.log('debuf');
             displaySeeds(func(arg1, arg2));
