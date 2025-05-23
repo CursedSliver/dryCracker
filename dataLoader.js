@@ -1,11 +1,13 @@
+let namesDataLoaded = false;
 function loadData() {
-    return;
+    if (namesDataLoaded) { return; }
     for (let i of 'abcdefghijklmnopqrstuvwxyz') {
         const script = document.createElement('script');
         script.src = './dataFiles/dataFilesNames/' + i + 'Data.js';
         script.type = 'text/javascript';
         document.head.appendChild(script);
     }
+    namesDataLoaded = true;
 }
 
 function loadTData(str, destination) {

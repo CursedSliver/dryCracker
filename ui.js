@@ -3,6 +3,7 @@ for (let i = 0; i < 50; i++) {
     grandmaSlots.push(-1);
 }
 //to do later: implement a keyboard to do the grandmas
+//dynamic finds instead of pressing a button (shows more to fill whenever needed)
 const container = document.getElementById('grandmaContainer');
 for (let i = 1; i <= 50; i++) {
     const containerI = document.createElement('div');

@@ -8,9 +8,6 @@ const lengthPerSeed = 10; //chances of collision is essentially zero
 
 const script = document.createElement('script');
 script.src = './dataLoader.js';
-script.onload = () => {
-    loadData();
-};
 document.head.appendChild(script);
 
 function findMatchingSeeds(names) {
