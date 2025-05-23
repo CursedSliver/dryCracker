@@ -1,5 +1,5 @@
 const Gnames = ['Granny','Gusher','Ethel','Edna','Doris','Maud','Hilda','Gladys','Michelle','Michele','Phyllis','Millicent','Muriel','Myrtle','Mildred','Mavis','Helen','Gloria','Sheila','Betty','Gertrude','Agatha','Beryl','Agnes','Pearl','Precious','Ruby','Vera','Bonnie','Ada','Bunny','Cookie','Darling','Gaga','GamGam','Memaw','Mimsy','Peanut','Nana','Nan','Tootsie','Warty','Stinky','Heinous'];
-const numMap = 'abcdefghijklmnopqrstuvwxyz1234567890!@#$%^_*()+[]{}|;:,.<>?'.split('');
+const numMap = 'abcdefghijklmnopqrstuvwxyz1234567890!@#$%^_*()?'.split('');
 //remember to replaceall the amps with _
 let data = {}; //a: ... b: ... c: ... etc.
 const lengthPerSeed = 10; //chances of collision is essentially zero
@@ -22,7 +22,7 @@ function findMatchingSeeds(names) {
 
     for (let i in data) {
         for (let ii = 0; ii < data[i].length; ii += lengthPerSeed) {
-            if (!(data[i].slice(ii, ii + lengthPerSeed).indexOf(nameStr) == 0)) {
+            if (!(data[i].slice(ii, ii + nameStr.length) == nameStr)) {
                 continue;
             }
 
