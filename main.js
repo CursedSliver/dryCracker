@@ -248,11 +248,12 @@ function getSeedFromGrandmaTypes(orderArr, present) {
     }
 }
 function awaitData(containerToAwait, func, arg1, arg2) {
-    if (Object.keys(containerToAwait).length > 0) {
+    if (loadStatuses[containerToAwait] >= 1 && loadStatuses[containerToAwait] < 27) { return; }
+    if (loadStatuses[containerToAwait]) {
         return displaySeeds(func(arg1, arg2));
     }
     const interval = setInterval(() => {
-        if (Object.keys(containerToAwait).length > 0) {
+        if (loadStatuses[containerToAwait]) {
             clearInterval(interval);
             displaySeeds(func(arg1, arg2));
         }
