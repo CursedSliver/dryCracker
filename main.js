@@ -253,7 +253,7 @@ function awaitData(containerToAwait, func, arg1, arg2) {
         return displaySeeds(func(arg1, arg2));
     }
     const interval = setInterval(() => {
-        if (loadStatuses[containerToAwait]) {
+        if (!loadStatuses[containerToAwait]) {
             clearInterval(interval);
             displaySeeds(func(arg1, arg2));
         }
