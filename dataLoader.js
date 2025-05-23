@@ -12,6 +12,9 @@ function loadData() {
 
 function loadTData(str, destination) {
     const alphabet = 'abcdefghijklmnopqrstuvwxyz';
+    if (loadStatuses[destination] > 0) {
+        return;
+    }
     loadStatuses[destination]++;
     for (let i of alphabet) {
         fetch('./dataFiles/' + str + '/' + i + 'Data.json').then(res => {
