@@ -94,12 +94,89 @@ function computeData(initial) {
 //iterative: 
 //crackSeedIterative(['Doris', 'Cookie', 'Ethel']); 
 //let timeNew = Date.now(); 
+/*
 (function() { 
     const c = 24;
     for (let i = 0; i < 2; i++) {
         console.log('doing ' + numMap[i + c]);
         document.getElementById('result' + i).textContent = data[numMap[i + c]].replaceAll('&amp;', '_');
     }
-})();
+})();*/
 
 //(function() { document.getElementById('result0').textContent = data.a.replaceAll('&amp;', '_'); })()
+
+//Math.seedrandom('cnxjw' + ' 1 19'); Math.random(); Math.random(); Math.random(); Math.random(); console.log(grandmaTypes[Math.floor(Math.random() * 3)], grandmaTypes[Math.floor(Math.random() * 3)], grandmaTypes[Math.floor(Math.random() * 3)], grandmaTypes[Math.floor(Math.random() * 3)], grandmaTypes[Math.floor(Math.random() * 3)], grandmaTypes[Math.floor(Math.random() * 3)]);
+
+function computeTypesData(initial, amount) {
+    const alphabet = 'abcdefghijklmnopqrstuvwxyz';
+    const stack = ['']; // Start with an empty string
+    let dataN = '';
+
+    while (stack.length > 0) {
+        const current = stack.pop();
+
+        if (stack.length % 10000 === 0) { console.log(stack.length); }
+
+        if (current.length === 4) {
+            for (let i = 0; i < lengthPerCompleteSeed; i++) {
+                Math.seedrandom(initial + current + ' 1 ' + i);
+                Math.random(); Math.random(); 
+                dataN += numMap[Math.floor(Math.random() * amount)];
+            }
+        } else {
+            for (let i = 0; i < alphabet.length; i++) {
+                stack.unshift(current + alphabet[i]);
+            }
+        }
+    }
+
+    return dataN;
+}
+
+function computeDualTypesData(initial) {
+    const alphabet = `abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_+`;
+    const stack = ['']; // Start with an empty string
+    let dataN = '';
+
+    while (stack.length > 0) {
+        const current = stack.pop();
+
+        if (stack.length % 10000 === 0) { console.log(stack.length); }
+
+        if (current.length === 4) {
+            for (let i = 0; i < lengthPerMinimalSeed; i += 2) {
+                Math.seedrandom(initial + current + ' 1 ' + i);
+                Math.random(); Math.random(); 
+                const f = Math.floor(Math.random() * 8);
+                Math.seedrandom(initial + current + ' 1 ' + (i + 1));
+                Math.random(); Math.random(); 
+                dataN += alphabet[f * 8 + Math.floor(Math.random() * 8)];
+            }
+        } else {
+            for (let i = 0; i < 26; i++) {
+                stack.unshift(current + alphabet[i]);
+            }
+        }
+    }
+
+    return dataN;
+}
+
+(function() { 
+    const c = 24;
+    for (let i = 0; i < 2; i++) {
+        console.log('doing ' + numMap[i + c]);
+        const buttonElement = document.createElement('button');
+        buttonElement.textContent = `Copy ${numMap[i + c]}`;
+        tData.simplified[numMap[i + c]] = computeDualTypesData(numMap[i + c]);
+        buttonElement.onclick = () => {
+            navigator.clipboard.writeText(tData.simplified[numMap[i + c]]).then(() => {
+            console.log(`Copied ${numMap[i + c]} data to clipboard`);
+            }).catch(err => {
+            console.error('Failed to copy text: ', err);
+            });
+        };
+        document.body.appendChild(buttonElement);
+    }
+})();
+
