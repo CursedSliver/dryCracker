@@ -96,8 +96,8 @@ function computeData(initial) {
 //let timeNew = Date.now(); 
 /*
 (function() { 
-    const c = 24;
-    for (let i = 0; i < 2; i++) {
+    const c = 0;
+    for (let i = 0; i < 13; i++) {
         console.log('doing ' + numMap[i + c]);
         document.getElementById('result' + i).textContent = data[numMap[i + c]].replaceAll('&amp;', '_');
     }
@@ -163,8 +163,8 @@ function computeDualTypesData(initial) {
 }
 
 (function() { 
-    const c = 24;
-    for (let i = 0; i < 2; i++) {
+    const c = 25;
+    for (let i = 0; i < 1; i++) {
         console.log('doing ' + numMap[i + c]);
         const buttonElement = document.createElement('button');
         buttonElement.textContent = `Copy ${numMap[i + c]}`;

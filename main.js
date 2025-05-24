@@ -218,7 +218,7 @@ function getSeedFromGrandmaTypes(orderArr, present) {
     let absent = {};
     let largest = Math.max(...present);
     present.sort((a, b) => a - b);
-    console.log(orderArr, present);
+    //console.log(orderArr, present);
     let num = 0;
     for (let i = 0; i <= largest; i++) {
         if (present.includes(i)) { absent[i] = num; } else { num++; }
@@ -229,7 +229,7 @@ function getSeedFromGrandmaTypes(orderArr, present) {
     for (let i in present) {
         present[i] -= absent[present[i]];
     }
-    console.log(orderArr, present);
+    //console.log(orderArr, present);
     const amount = present.length;
 
     //determine which scheme to use
@@ -283,7 +283,7 @@ let tData = {
     simplified: {} 
 }
 const allNormalsPresent = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
-const lengthPerNearCompleteSeed = 13;
+const lengthPerNearCompleteSeed = 4;
 function getSeedFromAllNormals(orderA, amount) {
     //exactly 19 grandma types, default without invoking seasons
     //something something 13 grandma types to guarantee a lack of collision
@@ -311,7 +311,7 @@ function getSeedFromAllNormals(orderA, amount) {
 }
 
 const allPossiblePresent = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
-const lengthPerCompleteSeed = 13;
+const lengthPerCompleteSeed = 4;
 function getSeedFromComplete(orderA, amount) {
     //exactly 20 grandma types, which is with either easter or christmas
     let orderArr = orderA.slice(0, Math.min(orderA.length, lengthPerCompleteSeed));
@@ -336,7 +336,7 @@ function getSeedFromComplete(orderA, amount) {
     return bruteForceCheck(compileOutput(possibleSeeds), orderA, amount);
 }
 
-const lengthPerMinimalSeed = 50; //actually 25 in practice, accomodates for a minimum ranges allocation resolution of 2 parts (e.g. for 0-0.5, 0.5-1), eliminates collisions fairly hard
+const lengthPerMinimalSeed = 20; //actually 10 in practice, accomodates for a minimum ranges allocation resolution of 2 parts (e.g. for 0-0.5, 0.5-1), eliminates collisions fairly hard
 const simplifyingMap = {
     2: 2,
     3: 2,
