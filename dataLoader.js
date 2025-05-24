@@ -23,6 +23,8 @@ function loadTData(str, destination) {
         })
         .then(data => { tData[destination][i] = data; loadStatuses[destination]++; });
     }
+
+    document.getElementById('outputBoxTypes').value = 'Fetching data...';
 }
 
 const loadStatuses = {

@@ -218,6 +218,7 @@ function getSeedFromGrandmaTypes(orderArr, present) {
     let absent = {};
     let largest = Math.max(...present);
     present.sort((a, b) => a - b);
+    console.log(orderArr, present);
     let num = 0;
     for (let i = 0; i <= largest; i++) {
         if (present.includes(i)) { absent[i] = num; } else { num++; }
@@ -228,7 +229,7 @@ function getSeedFromGrandmaTypes(orderArr, present) {
     for (let i in present) {
         present[i] -= absent[present[i]];
     }
-    console.log(orderArr);
+    console.log(orderArr, present);
     const amount = present.length;
 
     //determine which scheme to use
@@ -252,14 +253,14 @@ function getSeedFromGrandmaTypes(orderArr, present) {
 }
 function awaitData(key, func, arg1, arg2) {
     if (loadStatuses[key] >= 27) {
-        console.log('debuf2');
-        return displaySeeds(func(arg1, arg2));
+        document.getElementById('outputBoxTypes').value = 'Calculating...';
+        return setTimeout(() => displaySeeds(func(arg1, arg2)), 100);
     }
     const interval = setInterval(() => {
         if (loadStatuses[key] >= 27) {
             clearInterval(interval);
-            console.log('debuf');
-            displaySeeds(func(arg1, arg2));
+            document.getElementById('outputBoxTypes').value = 'Calculating...';
+            setTimeout(() => displaySeeds(func(arg1, arg2)), 100);
         }
     }, 10);
 }
@@ -283,11 +284,11 @@ let tData = {
 }
 const allNormalsPresent = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
 const lengthPerNearCompleteSeed = 13;
-function getSeedFromAllNormals(orderArr) {
+function getSeedFromAllNormals(orderA, amount) {
     //exactly 19 grandma types, default without invoking seasons
     //something something 13 grandma types to guarantee a lack of collision
     //orderArr is 0 to 18 representing the different types
-    orderArr = orderArr.slice(0, Math.min(orderArr.length, lengthPerNearCompleteSeed));
+    let orderArr = orderA.slice(0, Math.min(orderA.length, lengthPerNearCompleteSeed));
 
     let orderStr = '';
     for (let i = 0; i < orderArr.length; i++) {
@@ -306,14 +307,14 @@ function getSeedFromAllNormals(orderArr) {
         }
     }
 
-    return compileOutput(possibleSeeds);
+    return bruteForceCheck(compileOutput(possibleSeeds), orderA, amount);
 }
 
 const allPossiblePresent = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
 const lengthPerCompleteSeed = 13;
-function getSeedFromComplete(orderArr) {
+function getSeedFromComplete(orderA, amount) {
     //exactly 20 grandma types, which is with either easter or christmas
-    orderArr = orderArr.slice(0, Math.min(orderArr.length, lengthPerCompleteSeed));
+    let orderArr = orderA.slice(0, Math.min(orderA.length, lengthPerCompleteSeed));
 
     let orderStr = '';
     for (let i = 0; i < orderArr.length; i++) {
@@ -332,7 +333,7 @@ function getSeedFromComplete(orderArr) {
         }
     }
 
-    return compileOutput(possibleSeeds);
+    return bruteForceCheck(compileOutput(possibleSeeds), orderA, amount);
 }
 
 const lengthPerMinimalSeed = 50; //actually 25 in practice, accomodates for a minimum ranges allocation resolution of 2 parts (e.g. for 0-0.5, 0.5-1), eliminates collisions fairly hard
@@ -369,7 +370,8 @@ function getCrossings(original, toFit) {
     return crossings;
 }
 //getSeedFromGrandmaTypes([0, 3, 3, 2], [0, 1, 2, 3]);
-//cnwjx: getSeedFromGrandmaTypes(convertTypesToNumbers(['workerGrandma', 'farmerGrandma', 'alteredGrandma', 'grandmasGrandma', 'grandmasGrandma', 'workerGrandma', 'transmutedGrandma', 'alteredGrandma', 'workerGrandma', 'minerGrandma', 'grandma', 'grandma', 'grandma', 'grandmasGrandma', 'alteredGrandma', 'grandma']), [0, 1, 2, 3, 4, 5, 6, 7])
+//NOTE: Script grandma is from Script grannies upgrade, which is a synergy
+//cnwjx: getSeedFromGrandmaTypes(convertTypesToNumbers(['workerGrandma', 'farmerGrandma', 'transmutedGrandma', 'alteredGrandma', 'alteredGrandma', 'workerGrandma', 'transmutedGrandma', 'transmutedGrandma']), [0, 1, 2, 3, 4, 5, 6, 7])
 function decodeFirst(char) {
     const alphabet = `abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_+`;
     const f = alphabet.indexOf(char).toString(8);
@@ -380,54 +382,84 @@ function decodeSecond(char) {
     const f = alphabet.indexOf(char).toString(8);
     return parseInt(f[f.length - 1])
 }
-function getSeedFromSimplified(orderArr, amount) {
+function getSeedFromSimplified(orderA, amount) {
     //assumes 8, 4, or 2 types, discards unusable inputs
     const simplifiedDivide = simplifyingMap[amount];
+    const f = simplifiedDivide / 8;
     const crossings = getCrossings(amount, simplifiedDivide);
-    orderArr = orderArr.slice(0, Math.min(orderArr.length, lengthPerMinimalSeed));
+    let orderArr = orderA.slice(0, Math.min(orderA.length, lengthPerMinimalSeed));
 
-    console.log(orderArr, crossings);
+    //console.log(orderArr, crossings);
 
     for (let i in orderArr) {
-        if (crossings.includes(orderArr[i] / amount)) { orderArr[i] = null; continue; }
+        if (crossings.includes(orderArr[i])) { orderArr[i] = null; continue; }
         orderArr[i] = Math.floor(orderArr[i] / amount * simplifiedDivide);
     }
     if (orderArr.length % 2 !== 0) {
         orderArr.push(null);
     }
-    //console.log(orderArr);
+    console.log(orderArr, crossings);
 
     let possibleSeeds = [];
     for (let i in tData.simplified) {
         loop:
-        for (let ii = 0; ii < tData.simplified[i].length; ii += lengthPerMinimalSeed) {
-            const content = tData.simplified[i].slice(ii, ii + lengthPerMinimalSeed);
+        for (let ii = 0; ii < tData.simplified[i].length; ii += lengthPerMinimalSeed / 2) {
+            const content = tData.simplified[i].slice(ii, ii + lengthPerMinimalSeed / 2);
+            //if ((ii / (lengthPerMinimalSeed / 2)) % 1000000 === 0) { console.log(content); }
+            //if (content == 'rUYTsahW_QP4SuvhanCDUTQx+') { console.log('debug'); }
             for (let iii = 0; iii < orderArr.length / 2; iii++) {
-                if (orderArr[iii] === null) { continue; }
-                if (Math.floor(decodeFirst(content[iii]) * simplifiedDivide / 8) !== orderArr[iii * 2]) {
+                if (Math.floor(decodeFirst(content[iii]) * f) !== orderArr[iii * 2] && orderArr[iii * 2] !== null) {
                     continue loop;
                 }
-                if (Math.floor(decodeSecond(content[iii]) * simplifiedDivide / 8) !== orderArr[iii * 2 + 1]) {
+                if (Math.floor(decodeSecond(content[iii]) * f) !== orderArr[iii * 2 + 1] && iii * 2 + 1 >= orderArr.length && orderArr[iii * 2 + 1] !== null) {
                     continue loop;
                 }
             }
 
-            const index = ii / lengthPerMinimalSeed;
+            const index = ii / (lengthPerMinimalSeed / 2);
             possibleSeeds.push(i + index);
         }
     }
 
-    return compileOutput(possibleSeeds);
+    const result = bruteForceCheck(compileOutput(possibleSeeds), orderA, amount);
+    if (result.length > 20) { return ['Too many possible seeds! (try inputting more grandmas)']; }
+
+    return result;
+}
+
+function bruteForceCheck(seeds, orderArr, amount) {
+    //seeds is an array of strings, orderArr is an array of numbers
+    //orderArr is 0 to 20 representing the different types
+    const results = [];
+    loop:
+    for (let i in seeds) {
+        const seed = seeds[i];
+        for (let ii in orderArr) {
+            Math.seedrandom(seed + ' 1 ' + ii);
+            Math.random(); Math.random(); 
+            if (Math.floor(Math.random() * amount) !== orderArr[ii]) {
+                continue loop;
+            }
+        }
+        results.push(seed);
+    }
+    return results;
 }
  
-function test(seed) {
+function test(seed, count) {
     let dataN = '';
-    for (let i = 0; i < lengthPerNearCompleteSeed; i++) {
+    const alphabet = `abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_+`;
+    for (let i = 0; i < lengthPerMinimalSeed; i++) {
         Math.seedrandom(seed + ' 1 ' + i);
         Math.random(); Math.random(); 
-        dataN += Math.floor(Math.random() * 19) + '\n';
+        dataN += Math.floor(Math.random() * 8);
     }
-    return dataN;
+    console.log(dataN);
+    let news = '';
+    for (let i = 0; i < dataN.length; i += 2) {
+        news += alphabet[parseInt(dataN[i] * 8) + parseInt(dataN[i + 1])];
+    }
+    return news;
 }
 function verify(arr) {
     let str = '';
@@ -441,4 +473,3 @@ function verify(arr) {
 
 
 //test('cnxjw');
-//getSeedFromGrandmaTypes(convertTypesToNumbers(['alteredGrandma', 'minerGrandma', 'witchGrandma', 'metaGrandma', 'scriptGrandma']), allNormalsPresent)
