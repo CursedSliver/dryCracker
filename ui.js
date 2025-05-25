@@ -92,7 +92,7 @@ function crackBasedOnConfigs() {
         alert('Please select more grandmas.');
         return;
     }
-    const c = grandmaSlots.slice(0, 10)
+    const c = grandmaSlots
         .filter(x => x !== -1)
         .map(x => grandmaTypesFixed[x]);
     getSeedFromGrandmaTypes(
