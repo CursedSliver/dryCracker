@@ -1,4 +1,25 @@
 //TODO: fix the denial of fetching by reducing the size or having multiple fetches
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then(function(registrations) {
+        for(let registration of registrations) {
+            registration.unregister();
+        }
+    });
+}
+if ('caches' in window) {
+    caches.keys().then(function(names) {
+        for (let name of names) {
+            caches.delete(name);
+        }
+    });
+}
+const meta = document.createElement('meta');
+meta.httpEquiv = "Cache-Control";
+meta.content = "no-store, no-cache, must-revalidate, max-age=0";
+document.head.appendChild(meta);
+document.addEventListener('DOMContentLoaded', function() {
+    document.body.insertAdjacentHTML('afterbegin', '<meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">');
+});
 
 const Gnames = ['Granny','Gusher','Ethel','Edna','Doris','Maud','Hilda','Gladys','Michelle','Michele','Phyllis','Millicent','Muriel','Myrtle','Mildred','Mavis','Helen','Gloria','Sheila','Betty','Gertrude','Agatha','Beryl','Agnes','Pearl','Precious','Ruby','Vera','Bonnie','Ada','Bunny','Cookie','Darling','Gaga','GamGam','Memaw','Mimsy','Peanut','Nana','Nan','Tootsie','Warty','Stinky','Heinous'];
 const numMap = 'abcdefghijklmnopqrstuvwxyz1234567890!@#$%^_*()?'.split('');
@@ -252,17 +273,19 @@ function getSeedFromGrandmaTypes(orderArr, present) {
         throw new Error('Not enough grandma types present');
     }
 }
+let inProgress = false;
 async function awaitData(key, func, box, arg1, arg2) {
     if (loadStatuses[key] >= 27) {
         document.getElementById(box).value = 'Calculating...';
         await new Promise(resolve => setTimeout(resolve, 1));
-        await setTimeout(() => { displaySeeds(func(arg1, arg2)).then((v) => { return v; }); }, 10)
+        setTimeout(() => { displaySeeds(func(arg1, arg2)).then((v) => { return v; }); }, 10)
     }
     const interval = setInterval(async () => {
         if (loadStatuses[key] >= 27) {
             clearInterval(interval);
             document.getElementById(box).value = 'Calculating...';
             await new Promise(resolve => setTimeout(resolve, 0));
+            await new Promise(resolve => requestAnimationFrame(resolve));
             await displaySeeds(func(arg1, arg2)).then((v) => { return v; });
         }
     }, 10);
@@ -293,6 +316,8 @@ function getSeedFromAllNormals(orderA, amount) {
     //exactly 19 grandma types, default without invoking seasons
     //something something 13 grandma types to guarantee a lack of collision
     //orderArr is 0 to 18 representing the different types
+    if (inProgress) { return; }
+    inProgress = true;
     let orderArr = orderA.slice(0, Math.min(orderA.length, lengthPerNearCompleteSeed));
 
     let orderStr = '';
@@ -312,6 +337,8 @@ function getSeedFromAllNormals(orderA, amount) {
         }
     }
 
+    inProgress = false; 
+
     return bruteForceCheck(compileOutput(possibleSeeds), orderA, amount);
 }
 
@@ -319,6 +346,8 @@ const allPossiblePresent = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 const lengthPerCompleteSeed = 4;
 function getSeedFromComplete(orderA, amount) {
     //exactly 20 grandma types, which is with either easter or christmas
+    if (inProgress) { return; }
+    inProgress = true;
     let orderArr = orderA.slice(0, Math.min(orderA.length, lengthPerCompleteSeed));
 
     let orderStr = '';
@@ -337,6 +366,8 @@ function getSeedFromComplete(orderA, amount) {
             possibleSeeds.push(i + index);
         }
     }
+
+    inProgress = false; 
 
     return bruteForceCheck(compileOutput(possibleSeeds), orderA, amount);
 }
@@ -381,6 +412,8 @@ function getCrossings(original, toFit) {
 //cnwjx: getSeedFromGrandmaTypes(convertTypesToNumbers(['workerGrandma', 'farmerGrandma', 'transmutedGrandma', 'alteredGrandma', 'alteredGrandma', 'workerGrandma', 'transmutedGrandma', 'transmutedGrandma']), [0, 1, 2, 3, 4, 5, 6, 7])
 function getSeedFromSimplified(orderA, amount) {
     //assumes 8 or 4 types, discards unusable inputs
+    if (inProgress) { return; }
+    inProgress = true;
     const simplifiedDivide = simplifyingMap[amount];
     const f = simplifiedDivide / 8;
     const alphabet = `abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_+`;
@@ -423,6 +456,8 @@ function getSeedFromSimplified(orderA, amount) {
     const result = bruteForceCheck(compileOutput(possibleSeeds), orderA, amount);
     if (result.length > 20) { return ['Too many possible seeds! (try inputting more grandmas)']; }
 
+    inProgress = false; 
+
     return result;
 }
 
@@ -430,6 +465,8 @@ const lengthPerBinarySeed = 18; //18 grandmas 6 grandmas per byte for a total of
 function getSeedFromBinary(orderA, amount) {
     //2 types
     //each character is 6 bits (6 grandmas) encoded base64
+    if (inProgress) { return; }
+    inProgress = true;
     const alphabet = `abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_+`;
 
     const crossings = getCrossings(amount, 2);
@@ -456,19 +493,24 @@ function getSeedFromBinary(orderA, amount) {
             for (let iii = 0; iii < content.length; iii++) {
                 const pos = alphabet.indexOf(content[iii]);
                 for (let iiii = 0; iiii < 6; iiii++) {
-                    if ((pos >> (5 - iiii)) & 1 != orderArr[iii * 6 + iiii] && orderArr[iii * 6 + iiii] !== null) { continue loop; }
+                    if (((pos >> (5 - iiii)) & 1) != orderArr[iii * 6 + iiii] && orderArr[iii * 6 + iiii] !== null) { continue loop; }
                 }
             }
 
             const index = ii / (lengthPerBinarySeed / 6);
             possibleSeeds.push(i + index);
         }
+        console.log(i);
     }
 
-    //console.log('found ' + possibleSeeds.length + ' possible seeds!');
+    console.log('found ' + possibleSeeds.length + ' possible seeds!');
+
+    console.trace()
 
     const result = bruteForceCheck(compileOutput(possibleSeeds), orderA, amount);
     if (result.length > 20) { return ['Too many possible seeds! (try inputting more grandmas)']; }
+
+    inProgress = false; 
 
     return result;
 }
