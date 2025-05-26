@@ -107,7 +107,7 @@ document.getElementById(`grandmaPresentBox19`).click();
 document.getElementById(`grandmaPresentBox20`).click();
 
 const minGrandmasMap = {
-    2: 16,
+    2: 20,
     4: 8,
     8: 4
 }

@@ -23,5 +23,6 @@ const loadStatuses = {
     normal: 0,
     complete: 0,
     simplified: 0,
+    binary: 0,
     names: 0
 }

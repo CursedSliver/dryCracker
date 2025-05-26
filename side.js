@@ -162,21 +162,63 @@ function computeDualTypesData(initial) {
     return dataN;
 }
 
-(function() { 
-    const c = 14;
-    for (let i = 0; i < 12; i++) {
-        console.log('doing ' + numMap[i + c]);
-        const buttonElement = document.createElement('button');
-        buttonElement.textContent = `Copy ${numMap[i + c]}`;
-        tData.simplified[numMap[i + c]] = computeData(numMap[i + c]);
-        buttonElement.onclick = () => {
-            navigator.clipboard.writeText(tData.simplified[numMap[i + c]]).then(() => {
-            console.log(`Copied ${numMap[i + c]} data to clipboard`);
-            }).catch(err => {
-            console.error('Failed to copy text: ', err);
-            });
-        };
-        document.body.appendChild(buttonElement);
+function computeBinaryData(initial) {
+    const alphabet = `abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_+`;
+    const stack = ['']; // Start with an empty string
+    let dataN = '';
+
+    while (stack.length > 0) {
+        const current = stack.pop();
+
+        if (stack.length % 10000 === 0) { console.log(stack.length); }
+
+        if (current.length === 4) {
+            for (let i = 0; i < lengthPerBinarySeed; i += 6) {
+                let num = 0;
+                for (let ii = 0; ii < 6; ii++) {
+                    Math.seedrandom(initial + current + ' 1 ' + (i + ii));
+                    Math.random(); Math.random(); 
+                    if (Math.random() >= 0.5) {
+                        num |= (1 << (5 - ii));
+                    }
+                }
+                dataN += alphabet[num];
+            }
+        } else {
+            for (let i = 0; i < 26; i++) {
+                stack.unshift(current + alphabet[i]);
+            }
+        }
     }
+
+    return dataN;
+}
+
+(function() { 
+    const c = 0;
+    const lim = 26;
+    const f = (i) => {
+        if (i >= lim) { 
+            return;
+        }
+        console.log('doing ' + numMap[i + c] + ' (' + i + ')');
+        const data = computeDualTypesData(numMap[i + c]);
+        const jsonString = JSON.stringify(data, null, 2);
+
+        const blob = new Blob([jsonString], { type: "application/json" });
+  
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = numMap[i + c] + "Data.json";
+
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url); 
+
+        setTimeout(f, 1000, i + 1);
+    }
+    setTimeout(f, 1000, c);
 })();
 

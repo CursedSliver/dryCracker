@@ -240,10 +240,14 @@ function getSeedFromGrandmaTypes(orderArr, present) {
         awaitData('complete', getSeedFromComplete, 'outputBoxTypes', orderArr, amount);
     } else if (amount >= 21) {
         throw new Error('Invalid amount of grandma types present');
-    } else if (amount >= 4) {
+    } else if (simplifyingMap[amount] === 4 || simplifyingMap[amount] === 8) {
         if (loadStatuses['simplified'] >= 1 && loadStatuses['simplified'] < 27) { return; }
         loadTData('dataFilesTypeSimplified', 'simplified', 'outputBoxTypes');
         awaitData('simplified', getSeedFromSimplified, 'outputBoxTypes', orderArr, amount);
+    } else if (simplifyingMap[amount] === 2) {
+        if (loadStatuses['binary'] >= 1 && loadStatuses['binary'] < 27) { return; }
+        loadTData('dataFilesTypeBinary', 'binary', 'outputBoxTypes');
+        awaitData('binary', getSeedFromBinary, 'outputBoxTypes', orderArr, amount);
     } else {
         throw new Error('Not enough grandma types present');
     }
@@ -280,6 +284,7 @@ let tData = {
     normal: {},
     complete: {},
     simplified: {},
+    binary: {},
     names: {}
 }
 const allNormalsPresent = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
@@ -336,7 +341,7 @@ function getSeedFromComplete(orderA, amount) {
     return bruteForceCheck(compileOutput(possibleSeeds), orderA, amount);
 }
 
-const lengthPerMinimalSeed = 20; //actually 10 in practice, accomodates for a minimum ranges allocation resolution of 2 parts (e.g. for 0-0.5, 0.5-1), eliminates collisions fairly hard
+const lengthPerMinimalSeed = 10; //actually 5 in practice, accomodates for a minimum ranges allocation resolution of 2 parts (e.g. for 0-0.5, 0.5-1), eliminates collisions fairly hard
 const simplifyingMap = {
     2: 2,
     3: 2,
@@ -360,7 +365,6 @@ const simplifyingMap = {
     21: 8
 }
 function getCrossings(original, toFit) {
-    //slightly buggy rn
     if (original % toFit === 0) { return []; }
     const crossings = [];
     for (let i = 0; i < original; i++) {
@@ -375,20 +379,11 @@ function getCrossings(original, toFit) {
 //getSeedFromGrandmaTypes([0, 3, 3, 2], [0, 1, 2, 3]);
 //NOTE: Script grandma is from Script grannies upgrade, which is a synergy
 //cnwjx: getSeedFromGrandmaTypes(convertTypesToNumbers(['workerGrandma', 'farmerGrandma', 'transmutedGrandma', 'alteredGrandma', 'alteredGrandma', 'workerGrandma', 'transmutedGrandma', 'transmutedGrandma']), [0, 1, 2, 3, 4, 5, 6, 7])
-function decodeFirst(char) {
-    const alphabet = `abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_+`;
-    const f = alphabet.indexOf(char).toString(8);
-    return parseInt(f[f.length - 2] ?? 0);
-}
-function decodeSecond(char) {
-    const alphabet = `abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_+`;
-    const f = alphabet.indexOf(char).toString(8);
-    return parseInt(f[f.length - 1])
-}
 function getSeedFromSimplified(orderA, amount) {
-    //assumes 8, 4, or 2 types, discards unusable inputs
+    //assumes 8 or 4 types, discards unusable inputs
     const simplifiedDivide = simplifyingMap[amount];
     const f = simplifiedDivide / 8;
+    const alphabet = `abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_+`;
     const crossings = getCrossings(amount, simplifiedDivide);
     let orderArr = orderA.slice(0, Math.min(orderA.length, lengthPerMinimalSeed));
 
@@ -401,7 +396,7 @@ function getSeedFromSimplified(orderA, amount) {
     if (orderArr.length % 2 !== 0) {
         orderArr.push(null);
     }
-    console.log(orderArr, crossings);
+    console.log(orderArr, crossings, simplifiedDivide);
 
     let possibleSeeds = [];
     for (let i in tData.simplified) {
@@ -409,12 +404,13 @@ function getSeedFromSimplified(orderA, amount) {
         for (let ii = 0; ii < tData.simplified[i].length; ii += lengthPerMinimalSeed / 2) {
             const content = tData.simplified[i].slice(ii, ii + lengthPerMinimalSeed / 2);
             //if ((ii / (lengthPerMinimalSeed / 2)) % 1000000 === 0) { console.log(content); }
-            //if (content == 'rUYTsahW_QP4SuvhanCDUTQx+') { console.log('debug'); }
+            //if (content == 'rUYTs') { console.log('debug'); }
             for (let iii = 0; iii < orderArr.length / 2; iii++) {
-                if (Math.floor(decodeFirst(content[iii]) * f) !== orderArr[iii * 2] && orderArr[iii * 2] !== null) {
+                const h = alphabet.indexOf(content[iii]).toString(8);
+                if (Math.floor(parseInt(h[h.length - 2] ?? 0) * f) !== orderArr[iii * 2] && orderArr[iii * 2] !== null) {
                     continue loop;
                 }
-                if (Math.floor(decodeSecond(content[iii]) * f) !== orderArr[iii * 2 + 1] && iii * 2 + 1 >= orderArr.length && orderArr[iii * 2 + 1] !== null) {
+                if (Math.floor(parseInt(h[h.length - 1]) * f) !== orderArr[iii * 2 + 1] && iii * 2 + 1 >= orderArr.length && orderArr[iii * 2 + 1] !== null) {
                     continue loop;
                 }
             }
@@ -423,6 +419,53 @@ function getSeedFromSimplified(orderA, amount) {
             possibleSeeds.push(i + index);
         }
     }
+
+    const result = bruteForceCheck(compileOutput(possibleSeeds), orderA, amount);
+    if (result.length > 20) { return ['Too many possible seeds! (try inputting more grandmas)']; }
+
+    return result;
+}
+
+const lengthPerBinarySeed = 18; //18 grandmas 6 grandmas per byte for a total of 3 bytes
+function getSeedFromBinary(orderA, amount) {
+    //2 types
+    //each character is 6 bits (6 grandmas) encoded base64
+    const alphabet = `abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_+`;
+
+    const crossings = getCrossings(amount, 2);
+    let orderArr = orderA.slice(0, Math.min(orderA.length, lengthPerBinarySeed));
+
+    //console.log(orderArr, crossings);
+
+    for (let i in orderArr) {
+        if (crossings.includes(orderArr[i])) { orderArr[i] = null; continue; }
+        orderArr[i] = Math.floor(orderArr[i] / amount * 2);
+    }
+    for (let i = 0; i < orderArr.length % 6; i++) {
+        orderArr.push(null);
+    }
+    console.log(orderArr, crossings);
+
+    let possibleSeeds = [];
+    for (let i in tData.binary) {
+        loop:
+        for (let ii = 0; ii < tData.binary[i].length; ii += lengthPerBinarySeed / 6) {
+            const content = tData.binary[i].slice(ii, ii + lengthPerBinarySeed / 6);
+            //if ((ii / (lengthPerMinimalSeed / 2)) % 1000000 === 0) { console.log(content); }
+            //if (content == 'rUYTsa') { console.log('debug'); }
+            for (let iii = 0; iii < content.length; iii++) {
+                const pos = alphabet.indexOf(content[iii]);
+                for (let iiii = 0; iiii < 6; iiii++) {
+                    if ((pos >> (5 - iiii)) & 1 != orderArr[iii * 6 + iiii] && orderArr[iii * 6 + iiii] !== null) { continue loop; }
+                }
+            }
+
+            const index = ii / (lengthPerBinarySeed / 6);
+            possibleSeeds.push(i + index);
+        }
+    }
+
+    //console.log('found ' + possibleSeeds.length + ' possible seeds!');
 
     const result = bruteForceCheck(compileOutput(possibleSeeds), orderA, amount);
     if (result.length > 20) { return ['Too many possible seeds! (try inputting more grandmas)']; }
