@@ -1,20 +1,4 @@
-let namesDataLoaded = false;
-function loadData() {
-    if (namesDataLoaded) { return; }
-    const alphabet = 'abcdefghijklmnopqrstuvwxyz';
-    for (let i of alphabet) {
-        fetch('./dataFiles/' + str + '/' + i + 'Data.json').then(res => {
-            if (!res.ok) throw new Error(res.statusText);
-            return res.json();
-        })
-        .then(data => { tData[destination][i] = data; loadStatuses[destination]++; });
-    }
-
-    document.getElementById('outputBoxTypes').value = 'Fetching data...';
-    namesDataLoaded = true;
-}
-
-function loadTData(str, destination, failBox) {
+async function loadTData(str, destination, box) {
     const alphabet = 'abcdefghijklmnopqrstuvwxyz';
     if (loadStatuses[destination] > 0) {
         return;
@@ -22,22 +6,22 @@ function loadTData(str, destination, failBox) {
     loadStatuses[destination]++;
     for (let i of alphabet) {
         try {
-        fetch('./dataFiles/' + str + '/' + i + 'Data.json').then(res => {
-            if (!res.ok) throw new Error(res.statusText);
-            return res.json();
-        })
-        .then(data => { tData[destination][i] = data; loadStatuses[destination]++; });
+            document.getElementById(box).value = 'Fetching data... (' + (alphabet.indexOf(i) / 26 * 100).toFixed(0) + '%)';
+            await fetch('./dataFiles/' + str + '/' + i + 'Data.json').then(res => {
+                if (!res.ok) throw new Error(res.statusText);
+                return res.json();
+            })
+            .then(data => { tData[destination][i] = data; loadStatuses[destination]++; });
         } catch (err) {
-            document.getElementById(failBox).textContent = 'Failed to fetch data!';
+            document.getElementById(box).textContent = 'Failed to fetch data!';
             break; 
         }
     }
-
-    document.getElementById('outputBoxTypes').value = 'Fetching data...';
 }
 
 const loadStatuses = {
     normal: 0,
     complete: 0,
     simplified: 0,
+    names: 0
 }

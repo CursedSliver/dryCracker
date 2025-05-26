@@ -44,18 +44,25 @@
             text-align: center;
             width: 100%;
         }
+        .centered, h1, h2 {
+            margin: auto; 
+            text-align: center;
+        }
     </style>
 </head>
 <body>
     <h1>Dry Cracker</h1>
+    <br>
 
     <h2>Grandma type cracker</h2>
-
-    DO NOT USE ON MOBILE BANDWIDTH
+    <br>
     
-    <div style="margin: auto;">
+    <div class="centered">
+        DO NOT USE ON MOBILE BANDWIDTH
+        <br>
         <br>(you can ctrl click to decrement grandma types; grandma keyboard coming soon)
         <br>Also, you do not have to input on every grandma slot, but do not skip inputs.
+        <br>If this doesn't work, make sure to reload your game and reinput your grandmas.
         <br>If you are not able to fetch the data, try disabling your adblocker.
     </div>
     <div style="display: flex; align-items: center; justify-content: center; margin: 10px 0;">
@@ -71,7 +78,7 @@
         <button style="margin: 0;" onclick="for (let i = 0; i < 19; i++) { grandmasEnabled[i] = false; } refreshAll();">Disable all non-seasonals</button>
     </div>
     <div id="grandmasPresentContainer" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 20px; user-select: none; -webkit-user-select: none; -ms-user-select: none;">  </div>    </div>
-    <small>Idea credit goes to <code>helloperson.</code> on discord</small>
+    <div class="centered"><small>Idea credit goes to <code>helloperson.</code> on discord</small></div>
 
     <div style="display: flex; justify-content: center; margin-bottom: 20px;">
         <button style="font-size: 28px; padding: 20px 40px;" onclick="crackBasedOnConfigs();">Crack seed!</button>
@@ -79,21 +86,22 @@
 
     <textarea id="outputBoxTypes" style="width: 300px; height: 100px; margin: auto; display: block; text-align: center; " placeholder="Seeds will appear here..."></textarea>
 
+    <br>
     <h2>Grandma names cracker</h2>
+    <br>
 
-    Note: You do not need to input all grandma names; on average, 5 names are sufficient to guarantee exactly one valid seed; you will receive all possible seeds if your combination matches multiple. 
-    <br>Start from the left to the right and do not jump inputs. 
-    <h3>You must have Patreon grandma names <span>OFF</span>.</h3>
+    <div class="centered">
+        Note: You do not need to input all grandma names; on average, 5 names are sufficient to guarantee exactly one valid seed; you will receive all possible seeds if your combination matches multiple. 
+        <br>Start from the left to the right and do not jump inputs. 
+        <h3>You must have Patreon grandma names <span>OFF</span>.</h3>
+    </div>
     <div class="input-container" id="inputContainer" style="justify-content: center;"></div>
         
     </div>
-    <button style="font-size: 20px; padding: 10px 20px;" id="nameCrackPrepButton" onclick="loadData();document.getElementById('nameCrackActualButton').style.display = ''; document.getElementById('nameCrackPrepButton').style.display = 'none';">Prepare</button>
-    <button style="font-size: 20px; padding: 10px 20px; display: none;" id="nameCrackActualButton" onclick="crackSeedAndOutput();">Crack seed!</button>
+    <button style="font-size: 20px; padding: 10px 20px;" id="nameCrackActualButton" onclick="loadTData('dataFilesNames', 'names', 'outputBox');awaitData('names', crackSeedAndOutput, 'outputBox');">Crack seed!</button>
     <br>
     <textarea id="outputBox" style="width: 300px; height: 100px; margin: auto; display: block; text-align: center; " placeholder="Seeds will appear here..."></textarea>
 
-    If this doesn't work, make sure to reload your game and reinput your grandmas.
-    This website uses a lot of memory - please make sure to reload it often, and don't keep it on your browser for too long!
     <script src="./main.js"></script>
     <script src="./ui.js"></script>
     <script src="./keyboard.js"></script>

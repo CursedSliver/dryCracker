@@ -2,8 +2,7 @@
 
 const Gnames = ['Granny','Gusher','Ethel','Edna','Doris','Maud','Hilda','Gladys','Michelle','Michele','Phyllis','Millicent','Muriel','Myrtle','Mildred','Mavis','Helen','Gloria','Sheila','Betty','Gertrude','Agatha','Beryl','Agnes','Pearl','Precious','Ruby','Vera','Bonnie','Ada','Bunny','Cookie','Darling','Gaga','GamGam','Memaw','Mimsy','Peanut','Nana','Nan','Tootsie','Warty','Stinky','Heinous'];
 const numMap = 'abcdefghijklmnopqrstuvwxyz1234567890!@#$%^_*()?'.split('');
-let data = {}; //a: ... b: ... c: ... etc.
-const lengthPerSeed = 10; 
+const lengthPerSeed = 3; 
 
 (function(a,b,c,d,e,f){function k(a){var b,c=a.length,e=this,f=0,g=e.i=e.j=0,h=e.S=[];for(c||(a=[c++]);d>f;)h[f]=f++;for(f=0;d>f;f++)h[f]=h[g=j&g+a[f%c]+(b=h[f])],h[g]=b;(e.g=function(a){for(var b,c=0,f=e.i,g=e.j,h=e.S;a--;)b=h[f=j&f+1],c=c*d+h[j&(h[f]=h[g=j&g+b])+(h[g]=b)];return e.i=f,e.j=g,c})(d)}function l(a,b){var e,c=[],d=(typeof a)[0];if(b&&"o"==d)for(e in a)try{c.push(l(a[e],b-1))}catch(f){}return c.length?c:"s"==d?a:a+"\0"}function m(a,b){for(var d,c=a+"",e=0;c.length>e;)b[j&e]=j&(d^=19*b[j&e])+c.charCodeAt(e++);return o(b)}function n(c){try{return a.crypto.getRandomValues(c=new Uint8Array(d)),o(c)}catch(e){return[+new Date,a,a.navigator.plugins,a.screen,o(b)]}}function o(a){return String.fromCharCode.apply(0,a)}var g=c.pow(d,e),h=c.pow(2,f),i=2*h,j=d-1;c.seedrandom=function(a,f){var j=[],p=m(l(f?[a,o(b)]:0 in arguments?a:n(),3),j),q=new k(j);return m(o(q.S),b),c.random=function(){for(var a=q.g(e),b=g,c=0;h>a;)a=(a+c)*d,b*=d,c=q.g(1);for(;a>=i;)a/=2,b/=2,c>>>=1;return(a+c)/b},p},m(c.random(),b)})(this,[],Math,256,6,52);
 
@@ -18,9 +17,9 @@ function findMatchingSeeds(names) {
     }
     let possibleSeeds = [];
 
-    for (let i in data) {
-        for (let ii = 0; ii < data[i].length; ii += lengthPerSeed) {
-            if (!(data[i].slice(ii, ii + nameStr.length) == nameStr)) {
+    for (let i in tData.names) {
+        for (let ii = 0; ii < tData.names[i].length; ii += lengthPerSeed) {
+            if (!(tData.names[i].slice(ii, ii + nameStr.length) == nameStr)) {
                 continue;
             }
 
@@ -31,7 +30,7 @@ function findMatchingSeeds(names) {
 
     return bruteForceCheckNames(compileOutput(possibleSeeds), names);
 }
-function bruteFoceCheckNames(seeds, names) {
+function bruteForceCheckNames(seeds, names) {
     const results = [];
     loop:
     for (let i in seeds) {
@@ -67,7 +66,7 @@ function compileOutput(possibleSeeds) {
 function crackSeedAndOutput() {
     let names = [];
     let prev = 'temp';
-    for (let i = 0; i < lengthPerSeed; i++) {
+    for (let i = 0; i < 10; i++) {
         const select = document.getElementById('dropdown-' + i);
         if (select.value !== '' && prev === '') {
             alert('Do not jump inputs around. Please select the names in order from left to right.');
@@ -94,25 +93,6 @@ function crackSeedAndOutput() {
     }
     const output = document.getElementById('outputBox');   
     output.value = str;
-}
-
-const inputContainer = document.getElementById('inputContainer');
-
-for (let i = 0; i < lengthPerSeed; i++) {
-    const select = document.createElement('select');
-    select.id = `dropdown-${i}`;
-    select.className = 'GNameDropdown';
-    const optionNull = document.createElement('option');
-    optionNull.value = '';
-    optionNull.textContent = 'Grandma ' + (i + 1);
-    select.appendChild(optionNull);
-    JSON.parse(JSON.stringify(Gnames)).sort().forEach(name => {
-        const option = document.createElement('option');
-        option.value = name;
-        option.textContent = name;
-        select.appendChild(option);
-    });
-    inputContainer.appendChild(select);
 }
 
 function test(seed) {
@@ -253,35 +233,37 @@ function getSeedFromGrandmaTypes(orderArr, present) {
     if (amount === 19) {
         if (loadStatuses['normal'] >= 1 && loadStatuses['normal'] < 27) { return; }
         loadTData('dataFilesTypeNormal', 'normal', 'outputBoxTypes');
-        awaitData('normal', getSeedFromAllNormals, orderArr, amount);
+        awaitData('normal', getSeedFromAllNormals, 'outputBoxTypes', orderArr, amount);
     } else if (amount === 20) { 
         if (loadStatuses['complete'] >= 1 && loadStatuses['complete'] < 27) { return; }
         loadTData('dataFilesTypeComplete', 'complete', 'outputBoxTypes');
-        awaitData('complete', getSeedFromComplete, orderArr, amount);
+        awaitData('complete', getSeedFromComplete, 'outputBoxTypes', orderArr, amount);
     } else if (amount >= 21) {
         throw new Error('Invalid amount of grandma types present');
     } else if (amount >= 4) {
         if (loadStatuses['simplified'] >= 1 && loadStatuses['simplified'] < 27) { return; }
         loadTData('dataFilesTypeSimplified', 'simplified', 'outputBoxTypes');
-        awaitData('simplified', getSeedFromSimplified, orderArr, amount);
+        awaitData('simplified', getSeedFromSimplified, 'outputBoxTypes', orderArr, amount);
     } else {
         throw new Error('Not enough grandma types present');
     }
 }
-function awaitData(key, func, arg1, arg2) {
+async function awaitData(key, func, box, arg1, arg2) {
     if (loadStatuses[key] >= 27) {
-        document.getElementById('outputBoxTypes').value = 'Calculating...';
-        return setTimeout(() => displaySeeds(func(arg1, arg2)), 100);
+        document.getElementById(box).value = 'Calculating...';
+        await new Promise(resolve => setTimeout(resolve, 1));
+        await setTimeout(() => { displaySeeds(func(arg1, arg2)).then((v) => { return v; }); }, 10)
     }
-    const interval = setInterval(() => {
+    const interval = setInterval(async () => {
         if (loadStatuses[key] >= 27) {
             clearInterval(interval);
-            document.getElementById('outputBoxTypes').value = 'Calculating...';
-            setTimeout(() => displaySeeds(func(arg1, arg2)), 100);
+            document.getElementById(box).value = 'Calculating...';
+            await new Promise(resolve => setTimeout(resolve, 0));
+            await displaySeeds(func(arg1, arg2)).then((v) => { return v; });
         }
     }, 10);
 }
-function displaySeeds(result) {
+async function displaySeeds(result) {
     let str = '';
     for (let i in result) {
         str += result[i] + '\n';
@@ -297,7 +279,8 @@ function displaySeeds(result) {
 let tData = {
     normal: {},
     complete: {},
-    simplified: {} 
+    simplified: {},
+    names: {}
 }
 const allNormalsPresent = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
 const lengthPerNearCompleteSeed = 4;
@@ -371,7 +354,10 @@ const simplifyingMap = {
     15: 8,
     16: 8,
     17: 8,
-    18: 8
+    18: 8,
+    19: 8,
+    20: 8,
+    21: 8
 }
 function getCrossings(original, toFit) {
     //slightly buggy rn

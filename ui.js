@@ -1,3 +1,22 @@
+const inputContainer = document.getElementById('inputContainer');
+
+for (let i = 0; i < 10; i++) {
+    const select = document.createElement('select');
+    select.id = `dropdown-${i}`;
+    select.className = 'GNameDropdown';
+    const optionNull = document.createElement('option');
+    optionNull.value = '';
+    optionNull.textContent = 'Grandma ' + (i + 1);
+    select.appendChild(optionNull);
+    JSON.parse(JSON.stringify(Gnames)).sort().forEach(name => {
+        const option = document.createElement('option');
+        option.value = name;
+        option.textContent = name;
+        select.appendChild(option);
+    });
+    inputContainer.appendChild(select);
+}
+
 let grandmaSlots = [];
 let slotsShownThreshold = 10;
 let grandmasEnabled = [];
@@ -87,11 +106,18 @@ function updateType(box, i) {
 document.getElementById(`grandmaPresentBox19`).click();
 document.getElementById(`grandmaPresentBox20`).click();
 
+const minGrandmasMap = {
+    2: 16,
+    4: 8,
+    8: 4
+}
 function crackBasedOnConfigs() {
-    if (grandmaSlots.slice(0, 5).includes(-1)) { 
+    if (grandmaSlots.slice(0, minGrandmasMap[simplifyingMap[grandmasEnabled.filter(x => x).length]]).includes(-1)) { 
         alert('Please select more grandmas.');
         return;
     }
+    if (!grandmasEnabled[0]) { alert('Default grandma can never be disabled in-game.'); }
+    if (grandmasEnabled[19] && grandmasEnabled[20]) { alert('Both seasonal grandmas can never exist at once in-game.'); }
     const c = grandmaSlots
         .filter(x => x !== -1)
         .map(x => grandmaTypesFixed[x]);

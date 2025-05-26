@@ -163,12 +163,12 @@ function computeDualTypesData(initial) {
 }
 
 (function() { 
-    const c = 25;
-    for (let i = 0; i < 1; i++) {
+    const c = 14;
+    for (let i = 0; i < 12; i++) {
         console.log('doing ' + numMap[i + c]);
         const buttonElement = document.createElement('button');
         buttonElement.textContent = `Copy ${numMap[i + c]}`;
-        tData.simplified[numMap[i + c]] = computeDualTypesData(numMap[i + c]);
+        tData.simplified[numMap[i + c]] = computeData(numMap[i + c]);
         buttonElement.onclick = () => {
             navigator.clipboard.writeText(tData.simplified[numMap[i + c]]).then(() => {
             console.log(`Copied ${numMap[i + c]} data to clipboard`);
