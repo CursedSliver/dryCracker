@@ -48,6 +48,10 @@
             margin: auto; 
             text-align: center;
         }
+        body {
+            font-family: 'Lato', Arial, sans-serif;
+        }
+        @import url('https://fonts.googleapis.com/css?family=Lato:400,700&display=swap');
     </style>
 </head>
 <body>
@@ -57,12 +61,29 @@
     <h2>Grandma type cracker</h2>
     <br>
     
+    <div id="crackerInfo" style="margin: 20px; padding: 20px; border: 2px gray ridge; text-align: center; line-height: 130%;">
+        <h2>What is a seed?</h2>
+        <br>In Cookie Clicker, a game seed is a combination of 5 letters that determines certain random events. It is useful for predicting certain events, primarily outcomes from the Force the Hand of Fate spell in the Grimoire, using the <a href="https://joseph3079.github.io/FtHoF-Planner-v5/" target="_blank">FtHoF planner website</a>.
+        <br>Your game seed and its associated predictions are normally accessible by exporting your save and inputting it into the website; however, in the new console release of Cookie Clicker, the export save buttons have been removed. Luckily, you can still "crack" and obtain your seed anyways by analyzing certain aspects of the game, such as your grandmas, which is what this website does. You can then import your 5-letter string into your planner directly to get your predictions.
+        <br>Note that your seed resets upon wiping save or ascending!
+        <br>
+        <br>
+        <h2>How do I use it?</h2>
+        <br>Input info regarding your Grandmas in the building menu (not your store!). "Grandma 1" is the top-leftmost grandma, and the grandmas go in a diagonal downward, then back up to the top of the next diagonal (3 grandmas per diagonal), as follows:
+        <div style="display: flex; justify-content: center;">
+            <img src="./imgs/grandmaExample.png" alt="Grandma Example">
+        </div>
+        <br>You may try cracking this seed; make sure to set your grandma types to only have the first 8 grandmas enabled. The expected seed is "iatjv". If you don't get the seed, you can ask on #cookie-clicker of <a href="https://discord.gg/cookie">the official Dashnet Forums discord server</a> (though, I strongly advise you to try rereading everything before doing so)
+    </div>
+    <button id="infoHide" style="font-size: 16px; padding: 10px 20px; margin-top: -10px;" onclick="document.getElementById('crackerInfo').style.display = 'none'; document.getElementById('infoHide').style.display = 'none'; document.getElementById('infoShow').style.display = '';">Hide info</button>
+    <button id="infoShow" style="font-size: 16px; padding: 10px 20px; margin-top: -10px; display: none;" onclick="document.getElementById('crackerInfo').style.display = ''; document.getElementById('infoHide').style.display = ''; document.getElementById('infoShow').style.display = 'none';">Show info</button>
+    <br>
     <div class="centered">
         DO NOT USE ON MOBILE BANDWIDTH
         <br>
         <br>(you can ctrl click to decrement grandma types; grandma keyboard coming soon)
         <br>Also, you do not have to input on every grandma slot, but do not skip inputs.
-        <br>If this doesn't work, make sure to reload your game and reinput your grandmas.
+        <br>If this doesn't work, try reloading your game and reinputting your grandmas.
         <br>If you are not able to fetch the data, try disabling your adblocker.
     </div>
     <div style="display: flex; align-items: center; justify-content: center; margin: 10px 0;">

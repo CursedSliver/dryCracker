@@ -1,37 +1,57 @@
-let dataLoadSimultaneous = 4; // Number of simultaneous data loads
+let dataLoadSimultaneous = 8; // Number of simultaneous data loads
 async function loadTData(str, destination, box) {
     const alphabet = 'abcdefghijklmnopqrstuvwxyz';
     if (loadStatuses[destination] > 0) {
         return;
     }
     loadStatuses[destination]++;
-    for (let i = 0; i < alphabet.length; i += dataLoadSimultaneous) {
-        const promises = [];
-        for (let j = 0; j < dataLoadSimultaneous && (i + j) < alphabet.length; j++) {
-            const letter = alphabet[i + j];
-            const url = `./dataFiles/${str}/${letter}Data.json`;
-            promises.push(
-            fetch(url)
-                .then(res => {
-                if (!res.ok) throw new Error(res.statusText);
-                return res.json();
-                })
-                .then(data => { 
-                tData[destination][letter] = data; 
-                loadStatuses[destination]++; 
-                })
-                .catch(err => {
-                document.getElementById(box).textContent = 'Failed to fetch data!';
-                throw err;
-                })
-            );
+    let loadedCount = 0;
+    const total = alphabet.length;
+
+    function updateProgress() {
+        const percent = ((loadedCount / total) * 100).toFixed(0);
+        document.getElementById(box).value = `Fetching data... (${percent}%)`;
+    }
+
+    const stream = new ReadableStream({
+        async start(controller) {
+            for (let i = 0; i < alphabet.length; i++) {
+                const letter = alphabet[i];
+                const url = `./dataFiles/${str}/${letter}Data.json`;
+                controller.enqueue({ letter, url });
+            }
+            controller.close();
         }
-        document.getElementById(box).value = 'Fetching data... (' + (i / 26 * 100).toFixed(0) + '%)';
+    });
+
+    const reader = stream.getReader();
+    const fetchNext = async () => {
+        const { value, done } = await reader.read();
+        if (done) return;
+        const { letter, url } = value;
         try {
-            await Promise.all(promises);
+            const res = await fetch(url);
+            if (!res.ok) throw new Error(res.statusText);
+            const data = await res.json();
+            tData[destination][letter] = data;
         } catch (err) {
-            break;
+            document.getElementById(box).textContent = 'Failed to fetch data! (Try disabling your adblocker, if you have one)';
+            throw err;
         }
+        loadedCount++;
+        updateProgress();
+        await fetchNext();
+    };
+
+    const workers = [];
+    for (let i = 0; i < dataLoadSimultaneous; i++) {
+        workers.push(fetchNext());  
+    }
+    try {
+        await Promise.all(workers);
+        loadStatuses[destination] += loadedCount;
+    } catch (e) {
+
     }
 }
 
