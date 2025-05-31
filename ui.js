@@ -106,6 +106,10 @@ function updateType(box, i) {
 document.getElementById(`grandmaPresentBox19`).click();
 document.getElementById(`grandmaPresentBox20`).click();
 
+if (JSON.parse(localStorage.getItem('infoHidden'))) { 
+    document.getElementById('infoHide').click(); localStorage.setItem('infoHidden', true);
+}
+
 const minGrandmasMap = {
     2: 20,
     4: 8,

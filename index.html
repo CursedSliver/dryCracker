@@ -75,8 +75,8 @@
         </div>
         <br>You may try cracking this seed; make sure to set your grandma types to only have the first 8 grandmas enabled. The expected seed is "iatjv". If you don't get the seed, you can ask on #cookie-clicker of <a href="https://discord.gg/cookie">the official Dashnet Forums discord server</a> (though, I strongly advise you to try rereading everything before doing so)
     </div>
-    <button id="infoHide" style="font-size: 16px; padding: 10px 20px; margin-top: -10px;" onclick="document.getElementById('crackerInfo').style.display = 'none'; document.getElementById('infoHide').style.display = 'none'; document.getElementById('infoShow').style.display = '';">Hide info</button>
-    <button id="infoShow" style="font-size: 16px; padding: 10px 20px; margin-top: -10px; display: none;" onclick="document.getElementById('crackerInfo').style.display = ''; document.getElementById('infoHide').style.display = ''; document.getElementById('infoShow').style.display = 'none';">Show info</button>
+    <button id="infoHide" style="font-size: 16px; padding: 10px 20px; margin-top: -10px;" onclick="document.getElementById('crackerInfo').style.display = 'none'; document.getElementById('infoHide').style.display = 'none'; document.getElementById('infoShow').style.display = ''; localStorage.setItem('infoHidden', true);">Hide info</button>
+    <button id="infoShow" style="font-size: 16px; padding: 10px 20px; margin-top: -10px; display: none;" onclick="document.getElementById('crackerInfo').style.display = ''; document.getElementById('infoHide').style.display = ''; document.getElementById('infoShow').style.display = 'none'; localStorage.setItem('infoHidden', false);">Show info</button>
     <br>
     <div class="centered">
         DO NOT USE ON MOBILE BANDWIDTH

@@ -5,6 +5,7 @@ async function loadTData(str, destination, box) {
         return;
     }
     loadStatuses[destination]++;
+    document.getElementById(box).value = `Fetching data... (0%)`;
     let loadedCount = 0;
     const total = alphabet.length;
 
@@ -75,14 +76,18 @@ Game.registerHook('logic', function() {
     }
     for (let i in Game.shimmers) {
         if (Game.shimmers[i].type != 'golden') { continue; }
-        if (Game.shimmers[i].life / Game.fps < Game.shimmers[i].dur - 5) { Game.shimmers[i].l.click(); }
+        if (Game.shimmers[i].life / Game.fps < Game.shimmers[i].dur - 5 && Game.shimmers[i].force != 'cookie storm drop') { Game.shimmers[i].l.click(); }
     }
     for (let i = 0; i < Math.floor((Date.now() - Game.lastClick - 5) / (1000 / 50)); i++) {
         Game.lastClick += (1000 / 50);
         Game.ClickCookie(undefined, undefined, true);
     }
+    if (Game.cookieClicks % 2 == 0) { Game.BigCookieState = ((Game.cookieClicks / 2) % 2) * 2; }
 });
+Game.chimeType = 4;
 for (let i in Game.Objects) {
     eval('Game.Objects["' + i + '"].buy='+Game.Objects[i].buy.toString().replace(`Game.Spend(price);`, `Game.Spend(price); if (this.amount == 0) { Game.timers['${i}'] = Date.now(); }`));
 }
-setTimeout(function() { eval('Game.ClickCookie='+Game.ClickCookie.toString().replace('amount)', 'amount, noUpdate)').replace('Game.lastClick=now;', 'if (!noUpdate) { Game.lastClick=now; }')); }, 100);*/
+Game.playCookieClickSound = function() { }
+setTimeout(function() { eval('Game.ClickCookie='+Game.ClickCookie.toString().replace('amount)', 'amount, noUpdate)').replace('Game.lastClick=now;', 'if (!noUpdate) { Game.lastClick=now; }').replace('Game.mouseX,Game.mouseY', 'l("backgroundLeftCanvas").offsetWidth / 2,l("backgroundLeftCanvas").offsetHeight * 0.4').replace('Game.mouseX+Math.random()*8-4,Game.mouseY-8+Math.random()*8-4', `l("backgroundLeftCanvas").offsetWidth / 2+Math.random()*8-4,l("backgroundLeftCanvas").offsetHeight * 0.4-8+Math.random()*8-4`)); }, 100);
+*/
